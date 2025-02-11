@@ -98,6 +98,11 @@ jobs:
 
       - name: Run Tests
         run: tox -e py312
+      
+      - name: Upload Coverage to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        run: coveralls --service=github
 
   package:
     name: Package & Upload Artifact
