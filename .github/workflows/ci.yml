@@ -93,8 +93,9 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install tox
-        run: pip install tox
+      - name: Install dependencies
+        run: |
+          pip install tox coveralls
 
       - name: Run Tests
         run: tox -e py312
