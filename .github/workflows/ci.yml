@@ -103,26 +103,14 @@ jobs:
   package:
     name: Package and Upload Artifact
     runs-on: ubuntu-20.04
+    needs: test
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        run: |
-          pip install tox
-          pip install -r src/requirements.txt
-
       - name: Read Major & Revision from pyproject.toml
         id: version
         run: echo "VERSION=$(grep '^version' pyproject.toml | cut -d '\"' -f2)" >> $GITHUB_ENV
-
-      - name: Run Tests
-        run: tox -e py312
 
       - name: Package app into tarball
         run: |
