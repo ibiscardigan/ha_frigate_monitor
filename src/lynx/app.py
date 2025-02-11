@@ -5,6 +5,7 @@ frigate instances
 """
 
 import time
+
 from periphery import GPIO
 
 # Define GPIO chip and pins
