@@ -41,6 +41,8 @@ jobs:
         run: pip install tox
 
       - name: Run Security Checks
+        env:
+          SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
         run: tox -e security
 
   complexity:
