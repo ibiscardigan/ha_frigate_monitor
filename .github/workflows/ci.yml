@@ -123,7 +123,7 @@ jobs:
       - name: Package app into tarball
         run: |
           cd src/
-          tar -czf lynx.tar.gz lynx requirements.txt setup.py
+          tar -czf lynx.tar.gz lynx requirements.txt
           mv lynx.tar.gz ../
 
       - name: Upload artifact
