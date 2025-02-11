@@ -12,8 +12,8 @@ from periphery import GPIO
 GPIO_CHIP = "/dev/gpiochip1"
 GREEN_PIN_1 = 63  # Physical Pin 29
 RED_PIN_1 = 64  # Physical Pin 31
-GREEN_PIN_2 = 65  # Physical Pin 33
-RED_PIN_2 = 67  # Physical Pin 37
+# GREEN_PIN_2 = 65  # Physical Pin 33
+# RED_PIN_2 = 67  # Physical Pin 37
 
 # Initialize GPIOs
 try:
