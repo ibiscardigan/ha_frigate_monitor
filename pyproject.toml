@@ -1,6 +1,9 @@
 [project]
 name = "lynx"
 version = "0.1"
+dependencies = [
+    "python-periphery"
+]
 
 [tool.black]
 line-length = 128
