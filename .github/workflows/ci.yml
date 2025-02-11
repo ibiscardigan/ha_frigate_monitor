@@ -101,13 +101,11 @@ jobs:
         run: tox -e py312
 
   package:
-    name: Package & Upload Artifact
-    needs: test  # Ensures packaging only runs if tests pass
+    name: Package and Upload Artifact
     runs-on: ubuntu-20.04
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -115,16 +113,20 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install -r ha_frigate_monitor/src/requirements.txt
+        run: pip install -r src/requirements.txt
+
+      - name: Run Tests
+        run: pytest tests/
 
       - name: Package app into tarball
         run: |
-          cd ha_frigate_monitor/src/
-          tar -czf lynx_app.tar.gz lynx requirements.txt setup.py
-          mv lynx_app.tar.gz ../../
+          cd src/
+          tar -czf lynx.tar.gz lynx requirements.txt setup.py
+          mv lynx.tar.gz ../
 
-      - name: Upload Artifact to GitHub Releases
-        uses: actions/upload-artifact@v3
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: lynx_app
-          path: lynx_app.tar.gz
+          name: lynx-package
+          path: lynx.tar.gz
+          compression-level: 9
