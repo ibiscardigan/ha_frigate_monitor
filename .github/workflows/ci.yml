@@ -1,4 +1,4 @@
-name: CI - Build and Upload Artifact
+name: CI - Build and Release
 
 on:
   push:
@@ -12,16 +12,13 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-
       - name: Install tox
         run: pip install tox
-
       - name: Run Linters
         run: tox -e lint
 
@@ -30,16 +27,13 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-
       - name: Install tox
         run: pip install tox
-
       - name: Run Security Checks
         env:
           SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
@@ -50,16 +44,13 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-
       - name: Install tox
         run: pip install tox
-
       - name: Run Complexity & Dead Code Checks
         run: tox -e complexity
 
@@ -68,16 +59,13 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-
       - name: Install tox
         run: pip install tox
-
       - name: Run Dependency Checks
         run: tox -e deps
 
@@ -86,17 +74,14 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-
       - name: Install dependencies
         run: |
           pip install tox
-
       - name: Run Tests
         run: tox -e py312
 
@@ -107,21 +92,47 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Read Major & Revision from pyproject.toml
         id: version
         run: echo "VERSION=$(grep '^version' pyproject.toml | cut -d '\"' -f2)" >> $GITHUB_ENV
-
       - name: Package app into tarball
         run: |
           cd src/
-          ls -la
           tar -czf lynx-v${{ env.VERSION }}.${{ github.run_number }}.tar.gz lynx requirements.txt
           mv lynx-v${{ env.VERSION }}.${{ github.run_number }}.tar.gz ../
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: lynx-package-v${{ env.VERSION }}.${{ github.run_number }}
           path: lynx-v${{ env.VERSION }}.${{ github.run_number }}.tar.gz
           compression-level: 9
+
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-20.04
+    needs: [lint, security, complexity, deps, test, package]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read Major & Revision from pyproject.toml
+        id: version
+        run: echo "VERSION=$(grep '^version' pyproject.toml | cut -d '\"' -f2)" >> $GITHUB_ENV
+
+      - name: Download Package Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: lynx-package-v${{ env.VERSION }}.${{ github.run_number }}
+          path: .
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "v${{ env.VERSION }}.${{ github.run_number }}"
+          name: "Lynx v${{ env.VERSION }}.${{ github.run_number }}"
+          body: "🚀 **New Release**: Lynx v${{ env.VERSION }}.${{ github.run_number }}"
+          draft: false
+          prerelease: false
+          generateReleaseNotes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "lynx-v${{ env.VERSION }}.${{ github.run_number }}.tar.gz"
