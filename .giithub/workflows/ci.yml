@@ -1,0 +1,131 @@
+name: CI - Build and Upload Artifact
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  lint:
+    name: Linting & Static Analysis
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install tox
+        run: pip install tox
+
+      - name: Run Linters
+        run: tox -e lint
+
+  security:
+    name: Security Audits
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install tox
+        run: pip install tox
+
+      - name: Run Security Checks
+        run: tox -e security
+
+  complexity:
+    name: Code Complexity & Dead Code Analysis
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install tox
+        run: pip install tox
+
+      - name: Run Complexity & Dead Code Checks
+        run: tox -e complexity
+
+  deps:
+    name: Dependency Analysis
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install tox
+        run: pip install tox
+
+      - name: Run Dependency Checks
+        run: tox -e deps
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: "3.12"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install tox
+        run: pip install tox
+
+      - name: Run Tests
+        run: tox -e py${{ matrix.python-version }}
+
+  package:
+    name: Package & Upload Artifact
+    needs: test  # Ensures packaging only runs if tests pass
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r ha_frigate_monitor/src/requirements.txt
+
+      - name: Package app into tarball
+        run: |
+          cd ha_frigate_monitor/src/
+          tar -czf lynx_app.tar.gz lynx requirements.txt setup.py
+          mv lynx_app.tar.gz ../../
+
+      - name: Upload Artifact to GitHub Releases
+        uses: actions/upload-artifact@v3
+        with:
+          name: lynx_app
+          path: lynx_app.tar.gz
