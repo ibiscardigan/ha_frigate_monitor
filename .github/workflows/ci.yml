@@ -103,7 +103,7 @@ jobs:
       - name: Upload Coverage to Coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        run: coveralls --service=github-actions
+        run: coveralls --service=github
 
   package:
     name: Package & Upload Artifact
