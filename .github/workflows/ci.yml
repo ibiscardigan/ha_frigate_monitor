@@ -82,10 +82,6 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: "3.12"
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -93,13 +89,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
 
       - name: Install tox
         run: pip install tox
 
       - name: Run Tests
-        run: tox -e py${{ matrix.python-version }}
+        run: tox -e py312
 
   package:
     name: Package & Upload Artifact
