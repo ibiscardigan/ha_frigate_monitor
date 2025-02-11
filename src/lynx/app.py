@@ -1,8 +1,8 @@
-'''
+"""
 Stand alone python app for displaying the state of a frigate instance in
 regards to its up/down state and its primary secondary state with other
 frigate instances
-'''
+"""
 
 import time
 from periphery import GPIO
