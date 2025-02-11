@@ -1,0 +1,23 @@
+[tool.black]
+line-length = 128
+target-version = ["py312"]
+skip-string-normalization = false
+
+[tool.isort]
+profile = "black"
+known_first_party = ["lynx"]
+multi_line_output = 3
+
+[tool.flake8]
+max-line-length = 128
+extend-ignore = ["E203", "W503"]
+exclude = [".tox", "__pycache__", "build", "dist"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+
+[tool.deptry]
+requirements_files = ["src/requirements.txt"]
+package_module_name_map = { "python-periphery" = "periphery" }
