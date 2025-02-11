@@ -21,3 +21,9 @@ ignore_missing_imports = true
 [tool.deptry]
 requirements_files = ["src/requirements.txt"]
 package_module_name_map = { "python-periphery" = "periphery" }
+
+[tool.safety]
+full-report = true
+
+[tool.pip-audit]
+requirement = "src/requirements.txt"
